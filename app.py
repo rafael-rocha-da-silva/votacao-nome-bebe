@@ -35,7 +35,7 @@ with st.expander("➕ Sugerir um novo nome"):
             df.loc[len(df)] = [novo_nome, 0]
             df.to_csv(ARQUIVO, index=False)
             st.success("Nome adicionado!")
-            st.experimental_rerun()
+            #st.experimental_rerun()
         else:
             st.warning("Nome inválido ou já existente.")
 
@@ -90,3 +90,4 @@ if st.button("☁️ Ver nuvem de nomes votados"):
         st.pyplot(fig)
     else:
         st.info("Ainda não há votos suficientes para gerar a nuvem ☁️")
+
