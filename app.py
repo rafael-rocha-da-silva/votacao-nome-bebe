@@ -4,46 +4,26 @@ import os
 from wordcloud import WordCloud
 import matplotlib.pyplot as plt
 
-
-
+# -------------------------
+# Configurações da página
+# -------------------------
 st.set_page_config(page_title="Votação Nome da Bebê 👶", layout="centered")
 
 ARQUIVO = "votos.csv"
-VOTOS_MAXIMOS = 3
-
-# -------------------------
-# Controle de votos por sessão
-# -------------------------
-if "votos_restantes" not in st.session_state:
-    st.session_state.votos_restantes = VOTOS_MAXIMOS
 
 # -------------------------
 # Inicialização dos dados
 # -------------------------
 if not os.path.exists(ARQUIVO):
     df = pd.DataFrame({
-        "nome": ["Olívia", "Beatriz", "Madalena"],
+        "nome": ["Alice", "Helena", "Laura"],
         "pontos": [0, 0, 0]
     })
     df.to_csv(ARQUIVO, index=False)
 else:
     df = pd.read_csv(ARQUIVO)
 
-if "ja_votou" not in st.session_state:
-    st.session_state.ja_votou = False
-
 st.title("👶 Votação para o nome da bebê")
-
-#st.info(f"🗳️ Você ainda tem **{st.session_state.votos_restantes} voto(s)**")
-
-# -------------------------
-# Se acabaram os votos
-# -------------------------
-if st.session_state.votos_restantes <= 0:
-    st.success("💖 Obrigado por participar! Você já utilizou todos os seus votos.")
-    st.markdown("### 📊 Resultado parcial")
-    st.table(df.sort_values("pontos", ascending=False))
-    st.stop()
 
 # -------------------------
 # Adicionar novo nome
@@ -55,7 +35,7 @@ with st.expander("➕ Sugerir um novo nome"):
             df.loc[len(df)] = [novo_nome, 0]
             df.to_csv(ARQUIVO, index=False)
             st.success("Nome adicionado!")
-            st.rerun()
+            st.experimental_rerun()
         else:
             st.warning("Nome inválido ou já existente.")
 
@@ -63,7 +43,6 @@ with st.expander("➕ Sugerir um novo nome"):
 # Votação
 # -------------------------
 nomes = df["nome"].tolist()
-
 st.markdown("### 🥇🥈🥉 Ordene sua preferência")
 
 primeiro = st.selectbox("🥇 Primeiro (3 pontos)", nomes)
@@ -80,21 +59,15 @@ if st.button("✅ Confirmar voto"):
     df.loc[df["nome"] == primeiro, "pontos"] += 3
     df.loc[df["nome"] == segundo, "pontos"] += 2
     df.loc[df["nome"] == terceiro, "pontos"] += 1
-
     df.to_csv(ARQUIVO, index=False)
-
-    st.session_state.votos_restantes -= 1
-    st.session_state.ja_votou = True # marca que já votou
-
     st.success("Voto registrado com sucesso 💖")
     st.balloons()
-    st.rerun()
+    #st.rerun()
 
 # -------------------------
-# Nuvem de nomes
+# Botão para mostrar a nuvem de palavras
 # -------------------------
-
-if st.session_state.ja_votou:
+if st.button("☁️ Ver nuvem de nomes votados"):
     st.markdown("---")
     st.markdown("### ☁️ Nuvem de nomes mais votados")
 
@@ -105,9 +78,10 @@ if st.session_state.ja_votou:
         wordcloud = WordCloud(
             width=800,
             height=400,
-            background_color="#FFF0F5",
-            colormap="Set2",
-            prefer_horizontal=0.5
+            background_color="white",
+            colormap="Pastel1",
+            prefer_horizontal=0.9,
+            font_path=None  # evita erro de fonte no Streamlit Cloud
         ).generate_from_frequencies(frequencias)
 
         fig, ax = plt.subplots()
@@ -115,5 +89,4 @@ if st.session_state.ja_votou:
         ax.axis("off")
         st.pyplot(fig)
     else:
-
         st.info("Ainda não há votos suficientes para gerar a nuvem ☁️")
