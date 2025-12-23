@@ -103,7 +103,6 @@ if st.session_state.ja_votou:
 
     if frequencias:
         wordcloud = WordCloud(
-            font_path="verdana",
             width=800,
             height=400,
             background_color="#FFF0F5",
@@ -116,4 +115,5 @@ if st.session_state.ja_votou:
         ax.axis("off")
         st.pyplot(fig)
     else:
+
         st.info("Ainda não há votos suficientes para gerar a nuvem ☁️")
